@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>मेरा ऑनलाइन टेस्ट</title>
+<style>
+body {
+  font-family: sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+  color: #172033;
+}
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 500px;
+  margin: auto;
+  box-shadow: 0 3px 12px #0001;
+}
+h2 { color: #174ea6; }
+button {
+  width: 100%;
+  padding: 13px;
+  margin: 7px 0;
+  border: 0;
+  border-radius: 9px;
+  font-size: 16px;
+  background: #e7efff;
+  color: #172033;
+}
+button:disabled { opacity: 0.8; }
+.primary {
+  background: #174ea6;
+  color: white;
+}
+#result { font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>📘 मेरा ऑनलाइन टेस्ट</h2>
+  <p id="progress"></p>
+  <h3 id="question">टेस्ट शुरू करें</h3>
+  <div id="options"></div>
+  <p id="feedback"></p>
+  <button class="primary" id="next" onclick="nextQuestion()">
+    टेस्ट शुरू करें
+  </button>
+  <p id="result"></p>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "भारत की राजधानी क्या है?",
+    options: ["मुंबई", "नई दिल्ली", "पटना", "जयपुर"],
+    answer: 1
+  },
+  {
+    q: "पानी का रासायनिक सूत्र क्या है?",
+    options: ["CO2", "O2", "H2O", "NaCl"],
+    answer: 2
+  },
+  {
+    q: "भारत का राष्ट्रीय पशु कौन है?",
+    options: ["शेर", "हाथी", "बाघ", "घोड़ा"],
+    answer: 2
+  }
+];
+
+let index = -1;
+let score = 0;
+let answered = false;
+
+function showQuestion() {
+  answered = false;
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("result").textContent = "";
+  document.getElementById("progress").textContent =
+    `प्रश्न ${index + 1} / ${questions.length}`;
+
+  const item = questions[index];
+  document.getElementById("question").textContent = item.q;
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+
+  item.options.forEach((option, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.onclick = () => checkAnswer(i);
+    box.appendChild(btn);
+  });
+
+  document.getElementById("next").textContent =
+    index === questions.length - 1
+      ? "रिजल्ट देखें"
+      : "अगला प्रश्न";
+}
+
+function checkAnswer(choice) {
+  if (answered) return;
+  answered = true;
+
+  const correct = questions[index].answer;
+  if (choice === correct) {
+    score++;
+    document.getElementById("feedback").textContent =
+      "✅ सही उत्तर!";
+  } else {
+    document.getElementById("feedback").textContent =
+      "❌ गलत उत्तर। सही उत्तर: " +
+      questions[index].options[correct];
+  }
+
+  document.querySelectorAll("#options button")
+    .forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === correct) btn.style.background = "#b7efc5";
+      else if (i === choice) btn.style.background = "#ffc9c9";
+    });
+}
+
+function nextQuestion() {
+  if (index === -1) {
+    index = 0;
+    showQuestion();
+    document.getElementById("next").textContent =
+      "उत्तर चुनें";
+    return;
+  }
+
+  if (!answered) {
+    document.getElementById("feedback").textContent =
+      "पहले एक उत्तर चुनें।";
+    return;
+  }
+
+  index++;
+  if (index < questions.length) {
+    showQuestion();
+  } else {
+    document.getElementById("question").textContent =
+      "टेस्ट पूरा हुआ!";
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("progress").textContent = "";
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("result").textContent =
+      `आपके अंक: ${score} / ${questions.length}`;
+    document.getElementById("next").textContent = "दोबारा टेस्ट दें";
+    document.getElementById("next").onclick = restart;
+  }
+}
+
+function restart() {
+  index = -1;
+  score = 0;
+  answered = false;
+  document.getElementById("question").textContent =
+    "टेस्ट शुरू करें";
+  document.getElementById("progress").textContent = "";
+  document.getElementById("options").innerHTML = "";
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("result").textContent = "";
+  document.getElementById("next").textContent = "टेस्ट शुरू करें";
+  document.getElementById("next").onclick = nextQuestion;
+}
+</script>
+</body>
+</html>
