@@ -1,6 +1,7 @@
 {
   "id": "./",
   "name": "Online Test App",
+  "description": "Online Test App for education, practice tests and exams in Hindi",
   "short_name": "Online Test",
   "description": "ऑनलाइन परीक्षा और अभ्यास ऐप",
   "lang": "hi",
