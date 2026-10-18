@@ -5,7 +5,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>मेरा ऑनलाइन टेस्ट</title>
+  
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#174ea6">
 <style>
+  
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("./sw.js")
+        .catch(function(error) {
+          console.log("Service Worker Error:", error);
+        });
+    });
+  }
+</script>
 body {
   font-family: sans-serif;
   background: #f0f4f8;
