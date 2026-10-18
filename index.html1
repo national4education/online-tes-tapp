@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ऑनलाइन टेस्ट</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #eef4ff;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .box {
+      background: white;
+      max-width: 450px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    h1 { color: #174ea6; }
+
+    #timer {
+      font-size: 22px;
+      font-weight: bold;
+      color: #d93025;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      border: none;
+      border-radius: 8px;
+      background: #174ea6;
+      color: white;
+      font-size: 17px;
+    }
+
+    button:disabled { background: #999; }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h1>ऑनलाइन टेस्ट</h1>
+
+    <p id="timer">समय: 02:00</p>
+    <p id="number"></p>
+    <h3 id="question"></h3>
+    <div id="options"></div>
+    <p id="result"></p>
+    <p id="score">स्कोर: 0</p>
+
+    <button id="next" onclick="nextQuestion()" disabled>
+      Next प्रश्न
+    </button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "भारत की राजधानी क्या है?",
+        options: ["दिल्ली", "मुंबई", "पटना"],
+        answer: "दिल्ली"
+      },
+      {
+        q: "भारत का राष्ट्रीय पशु कौन है?",
+        options: ["शेर", "बाघ", "हाथी"],
+        answer: "बाघ"
+      },
+      {
+        q: "एक सप्ताह में कितने दिन होते हैं?",
+        options: ["5", "7", "10"],
+        answer: "7"
+      },
+      {
+        q: "सूर्य किस दिशा से निकलता है?",
+        options: ["पश्चिम", "उत्तर", "पूर्व"],
+        answer: "पूर्व"
+      },
+      {
+        q: "भारत का राष्ट्रीय पक्षी कौन है?",
+        options: ["तोता", "मोर", "कबूतर"],
+        answer: "मोर"
+      }
+    ];
+
+    let current = 0;
+    let marks = 0;
+    let answered = false;
+    let timeLeft = 120;
+    let testEnded = false;
+    let timerId;
+
+    function showQuestion() {
+      if (testEnded) return;
+
+      answered = false;
+
+      document.getElementById("number").textContent =
+        "प्रश्न " + (current + 1) + " / " + questions.length;
+
+      document.getElementById("question").textContent =
+        questions[current].q;
+
+      document.getElementById("result").textContent = "";
+      document.getElementById("score").textContent = "स्कोर: " + marks;
+
+      const next = document.getElementById("next");
+      next.disabled = true;
+      next.textContent =
+        current === questions.length - 1 ? "रिजल्ट देखें" : "Next प्रश्न";
+
+      const optionsBox = document.getElementById("options");
+      optionsBox.innerHTML = "";
+
+      questions[current].options.forEach(function(option) {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = function() {
+          checkAnswer(option);
+        };
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (answered || testEnded) return;
+
+      answered = true;
+
+      if (selected === questions[current].answer) {
+        marks++;
+        document.getElementById("result").textContent = "सही जवाब!";
+      } else {
+        document.getElementById("result").textContent =
+          "गलत जवाब। सही उत्तर: " + questions[current].answer;
+      }
+
+      document.getElementById("score").textContent = "स्कोर: " + marks;
+      document.getElementById("next").disabled = false;
+
+      document.querySelectorAll("#options button").forEach(function(btn) {
+        btn.disabled = true;
+      });
+    }
+
+    function nextQuestion() {
+      if (!answered || testEnded) return;
+
+      current++;
+
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        finishTest("आपने सभी प्रश्न पूरे कर लिए!");
+      }
+    }
+
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+
+      document.getElementById("timer").textContent =
+        "समय: " +
+        String(minutes).padStart(2, "0") + ":" +
+        String(seconds).padStart(2, "0");
+
+      if (timeLeft <= 0) {
+        finishTest("समय समाप्त! आपका टेस्ट बंद कर दिया गया।");
+        return;
+      }
+
+      timeLeft--;
+    }
+
+    function finishTest(message) {
+      if (testEnded) return;
+
+      testEnded = true;
+      clearInterval(timerId);
+
+      document.getElementById("question").textContent = "टेस्ट समाप्त";
+      document.getElementById("number").textContent = message;
+      document.getElementById("options").innerHTML = "";
+      document.getElementById("result").textContent =
+        "आपके अंक: " + marks + " / " + questions.length;
+      document.getElementById("score").textContent =
+        "प्रतिशत: " + (marks / questions.length * 100) + "%";
+
+      const next = document.getElementById("next");
+      next.disabled = true;
+      next.textContent = "टेस्ट समाप्त";
+    }
+
+    showQuestion();
+    updateTimer();
+    timerId = setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html>
